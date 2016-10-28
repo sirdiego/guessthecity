@@ -1,4 +1,4 @@
-var map, toggle;
+var map, toggle, center, zoom;
 var button = document.getElementById('toggle');
 var passphrase = "sosecretsowowmuchinternet";
 var states = {
@@ -37,21 +37,21 @@ button.onclick = function (event) {
         this.innerHTML = states.guess.button;
     } else {
         map.setOptions(states.create.options);
+        map.setCenter(center);
+        map.setZoom(zoom);
         this.innerHTML = states.create.button;
     }
     toggle = !toggle;
-    console.log('test');
 };
 
 function encode() {
-    var center = map.getCenter().toJSON();
-    var zoom = map.getZoom();
-    return CryptoJS.AES.encrypt(zoom + "-" + center.lat + "-" + center.lng, passphrase);
+    center = map.getCenter();
+    zoom = map.getZoom();
+    return "v1" + CryptoJS.AES.encrypt(zoom + "|" + center.toJSON().lat + "|" + center.toJSON().lng, passphrase);
 }
 
 function decode() {
-    var location = CryptoJS.AES.decrypt(window.location.hash.substr(1), passphrase).toString(CryptoJS.enc.Utf8).split("-");
-
+    var location = CryptoJS.AES.decrypt(window.location.hash.substr(3), passphrase).toString(CryptoJS.enc.Utf8).split("|");
     if (location.length !== 3) {
         return false;
     }
@@ -63,7 +63,6 @@ function initialize() {
     button.innerHTML = states.create.button;
     if (window.location.hash) {
         var custom = decode();
-        console.log(button);
         if (custom) {
             options = states.guess.options;
             options.center = custom.center;
