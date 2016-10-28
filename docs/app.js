@@ -55,7 +55,9 @@ function decode() {
     if (location.length !== 3) {
         return false;
     }
-    return {center: {lat: location[1] * 1, lng: location[2] * 1}, zoom: location[0] * 1};
+    center = {lat: location[1] * 1, lng: location[2] * 1};
+    zoom = location[0] * 1;
+    return {center: center, zoom: zoom};
 }
 
 function initialize() {
